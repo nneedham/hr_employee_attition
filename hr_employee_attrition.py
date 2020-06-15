@@ -60,5 +60,59 @@ sns.set(font_scale=2)
 num_heatmap = sns.heatmap(df_num.corr(), annot=True, cmap='Blues')
 num_heatmap.set_xticklabels(num_heatmap.get_yticklabels(), rotation=40)
 plt.show()
+# There are several correlations to note:
+    # Age, monthly income, total working years, 
+    # Years at company, Years in current role, Years since last promotion,
+    # and Years with current manager all seem to have some correlation with each other
+    # Most of this should be expected since as people age, they will gain experience 
+    # which will make them more valuable, but also more specialized so it might 
+    # make it more difficult for them to move out of the role they are in
+    # num of companies worked for doesn't quite fit into this cluster neatly, 
+    # which also should be expected since the longer you work at one company,
+    # the less time you have to work at other companies
+    # Usually the more companies that you work for the higher the salary, so it 
+    # is interesting that there isn't a strong correlation between number of companies worked 
+    # for and monthly income. Especially when years in current role and company and
+    # since last promotion and with current manager are so low... this indicates
+    # that this company strongly rewards loyalty. So a follow on question is
+    # whether or not they reward loyatly at the cost of productivity
+    # Since there are so many correlations it will be important to factor them
+    # into the regression analysis because it can make the coefficients of a 
+    # regression model unstable
+    # https://blog.exploratory.io/why-multicollinearity-is-bad-and-how-to-detect-it-in-your-regression-models-e40d782e67e
+    # So to correct for these multicolinearity we will drop a few columns
+    # We will drop all of the aforementioned columns and add each one once when we test regressions
 
 #Now let's create a df for the categorial variables. This will also include ordinal values such as ratings from 0-5
+df_cat = df[['Attrition',
+             'BusinessTravel',
+             'Department',
+             'Education',
+             'EducationField',
+             'EnvironmentSatisfaction',
+             'JobInvolvement',
+             'JobLevel',
+             'JobRole',
+             'JobSatisfaction',
+             'MaritalStatus',
+             'OverTime',
+             'PerformanceRating',
+             'RelationshipSatisfaction',
+             ]]
+#check for correlations
+sns.set(font_scale=2)
+num_heatmap = sns.heatmap(df_cat.corr(), annot=True, cmap='Blues')
+num_heatmap.set_xticklabels(num_heatmap.get_yticklabels(), rotation=40)
+plt.show()
+#Here we have few correlations than before. The strongest being Education and
+#Job level which makes sense
+
+#check for barplot
+for i in df_cat.columns:
+    cat_num = df_cat[i].value_counts()
+    print("graph for %s: total = %d" % (i, len(cat_num)))
+    chart = sns.barplot(x=cat_num.index, y=cat_num)
+    chart.set_xticklabels(chart.get_yticklabels(), rotation=45)
+    plt.show()
+    
+#FILL THIS IN LATER... WHAT DO YOU SEE FROM THE BARPLOT?
