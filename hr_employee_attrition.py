@@ -9,6 +9,7 @@ Created on Sat Jun 13 15:20:58 2020
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import numpy as np
 
 plt.rcParams['figure.figsize']=(30,15)
 plt.style.use('fivethirtyeight')
@@ -112,7 +113,64 @@ for i in df_cat.columns:
     cat_num = df_cat[i].value_counts()
     print("graph for %s: total = %d" % (i, len(cat_num)))
     chart = sns.barplot(x=cat_num.index, y=cat_num)
-    chart.set_xticklabels(chart.get_yticklabels(), rotation=45)
+    chart.set_xticklabels(chart.get_xticklabels(), rotation=45)
     plt.show()
     
-#FILL THIS IN LATER... WHAT DO YOU SEE FROM THE BARPLOT?
+#Here we can see one of the most important categories that we want to look at
+# attrition is ~ 14%
+df_cat['Attrition'].value_counts()
+print(237/(237+1233))
+
+#There are more single and divorced than married people at the company
+#Most people receive a 3 on the performance rating... interesting that 
+#no one received a 1 or a 2
+df_cat['PerformanceRating'].value_counts()
+print(226/(1244+226))
+#only 15.3 of the top performers receive a 4... it will be interesting to see 
+# if they leave or stay
+
+#let's do pivot tables
+#We will look at the categorical columns and compare them with attrition
+#Let's make a few more columns where we have counts of attrition yes and no
+
+df_cat['AttritYes'] = df_cat['Attrition'].apply(lambda x: 1 if x =='Yes' else 0)
+df_cat['AttritNo'] = df_cat['Attrition'].apply(lambda x: 1 if x =='No' else 0)
+
+p_columns = ['BusinessTravel',
+             'Department',
+             'Education',
+             'EducationField',
+             'EnvironmentSatisfaction',
+             'JobInvolvement',
+             'JobLevel',
+             'JobRole',
+             'JobSatisfaction',
+             'MaritalStatus',
+             'OverTime',
+             'PerformanceRating',
+             'RelationshipSatisfaction']
+
+for i in p_columns:
+    m = df_cat.pivot_table(columns=i, values = ['AttritYes','AttritNo'], aggfunc=np.sum)
+    #print(m)
+    m.loc['PercentAttrit'] = 0
+    for a in m:
+        m.loc['PercentAttrit'][a] = ((m[a][1])/(m[a][0]+m[a][1]))*100
+    print(m)
+    print("")
+
+#Pivot table analysis
+#There is a spike in those who travel frequently
+#Research and development have lower rates than sales and human resources
+# Education field FILL THIS IN
+# Low Environment satisfaction is higher than the others... makes sense
+# Lower Job involvement -> higher attrition
+# Job Role FILL THIS IN
+# Single people leave more... makes sense
+# Those who work overtime are more likely to leave
+# Worryingly performance rating is equal... indicates we are losing our top performers 
+# just as quickly as average performers
+# More likely to leave with lowest relationship satisfaction score, other scores don't matter
+
+
+#
